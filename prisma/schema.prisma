@@ -56,6 +56,18 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    posts         Post[]
+    password      String?
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String
+  body      String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
 }
 
 model VerificationToken {
