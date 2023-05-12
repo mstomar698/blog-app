@@ -47,6 +47,7 @@
 import { type NextApiRequest, type NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
+import { updateCache } from '~/utils/cacheUpdater';
 
 const prisma = new PrismaClient();
 const redis = new Redis();
@@ -59,6 +60,7 @@ export default async function handler(
 
   if (req.method === 'GET') {
     try {
+      await updateCache()
       const cachedPost = await redis.get(`post:${id}`);
       if (cachedPost) {
         const post = JSON.parse(cachedPost);
@@ -72,7 +74,7 @@ export default async function handler(
       if (!post) {
         return res.status(404).json({ error: 'Post not found' });
       }
-
+      await updateCache()
       await redis.set(`post:${id}`, JSON.stringify(post));
 
       return res.status(200).json({ post });
@@ -84,13 +86,14 @@ export default async function handler(
     const { body } = req.body;
 
     try {
+      await updateCache()
       const updatedPost = await prisma.post.update({
         where: { id: String(id) },
         data: { body },
       });
-
+      await updateCache()
       await redis.del(`post:${id}`);
-
+      await updateCache()
       return res.status(200).json({ post: updatedPost });
     } catch (error) {
       console.log('Error updating post:', error);

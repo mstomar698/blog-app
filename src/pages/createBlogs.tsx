@@ -7,6 +7,7 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { updateCache } from "~/utils/cacheUpdater";
 
 const CreateBlogs = () => {
   const { data: sessionData, status } = useSession();
@@ -38,6 +39,7 @@ const CreateBlogs = () => {
       },
       body: JSON.stringify({ title, body }),
     });
+
     if (response.ok) {
       void router.push("/blog");
     } else {
