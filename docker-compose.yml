@@ -9,3 +9,8 @@ services:
       POSTGRES_USER: mstomar698
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: acrudino
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - '6379:6379'
